@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Driftwood Coffee Roasters</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F9FAF8;
+      color: #1a1a1a;
+    }
+
+    /* Nav */
+    nav {
+      background: #1B4332;
+      padding: 0 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+    .nav-logo span { color: #52B788; }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      color: #95D5B2;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta {
+      background: #2D6A4F;
+      color: #fff !important;
+      padding: 8px 18px;
+      border-radius: 8px;
+      transition: background 0.15s !important;
+    }
+    .nav-cta:hover { background: #40916C !important; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #1B4332 0%, #2D6A4F 60%, #40916C 100%);
+      padding: 96px 48px;
+      text-align: center;
+      color: #fff;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      padding: 5px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #95D5B2;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .hero h1 em { font-style: normal; color: #52B788; }
+    .hero p {
+      font-size: 18px;
+      color: #B7E4C7;
+      max-width: 540px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: #52B788; color: #1B4332;
+      font-weight: 700; font-size: 15px;
+      padding: 13px 28px; border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .btn-primary:hover { background: #74C69D; transform: translateY(-1px); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.3);
+      color: #fff; font-size: 15px; font-weight: 600;
+      padding: 13px 28px; border-radius: 10px;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.18); }
+
+    /* Features */
+    .section { padding: 80px 48px; max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: #2D6A4F; margin-bottom: 12px;
+    }
+    .section h2 {
+      font-size: 36px; font-weight: 800; letter-spacing: -0.8px;
+      margin-bottom: 14px; color: #1a1a1a;
+    }
+    .section > p { color: #6B7280; font-size: 16px; line-height: 1.6; max-width: 540px; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 48px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #E8F5EE;
+      border-radius: 14px;
+      padding: 28px;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .card:hover { box-shadow: 0 6px 24px rgba(45,106,79,0.1); transform: translateY(-2px); }
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: #D8F3DC;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 16px;
+    }
+    .card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #1a1a1a; }
+    .card p  { font-size: 14px; color: #6B7280; line-height: 1.55; }
+
+    /* Products strip */
+    .products { background: #F0FDF4; padding: 64px 48px; }
+    .products-inner { max-width: 1100px; margin: 0 auto; }
+    .products h2 {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.5px;
+      margin-bottom: 32px; color: #1B4332;
+    }
+    .product-list { display: flex; gap: 16px; flex-wrap: wrap; }
+    .product-tag {
+      background: #fff; border: 1.5px solid #B7E4C7;
+      border-radius: 10px; padding: 10px 18px;
+      font-size: 14px; font-weight: 600; color: #2D6A4F;
+    }
+
+    /* Chat CTA banner */
+    .cta-banner {
+      background: #1B4332;
+      padding: 64px 48px;
+      text-align: center;
+      color: #fff;
+    }
+    .cta-banner h2 {
+      font-size: 32px; font-weight: 800; letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .cta-banner p { color: #95D5B2; font-size: 16px; margin-bottom: 28px; }
+    .cta-pulse {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: #2D6A4F; border: 1.5px solid #40916C;
+      border-radius: 12px; padding: 14px 24px;
+      font-size: 15px; font-weight: 600; color: #fff;
+      cursor: default;
+    }
+    .pulse-dot {
+      width: 10px; height: 10px; border-radius: 50%; background: #52B788;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* Footer */
+    footer {
+      background: #0D2318; color: #52B788;
+      text-align: center; padding: 24px;
+      font-size: 13px;
+    }
+    footer a { color: #52B788; text-decoration: none; }
+
+    /* Embed note */
+    .embed-note {
+      background: #1B4332; color: #B7E4C7;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px; padding: 12px 20px; text-align: center;
+      border-top: 1px solid #2D6A4F;
+    }
+    .embed-note span { color: #52B788; }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="nav-logo">Driftwood <span>Coffee</span></div>
+    <div class="nav-links">
+      <a href="#">Coffees</a>
+      <a href="#">Subscriptions</a>
+      <a href="#">Our Story</a>
+      <a href="#" class="nav-cta">Shop Now</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">Single-Origin · Small Batch</div>
+    <h1>Coffee roasted<br>to <em>perfection</em>.</h1>
+    <p>Sustainably sourced. Expertly roasted. Delivered straight to your door — freshness guaranteed.</p>
+    <div class="hero-btns">
+      <a href="#" class="btn-primary">Start Your Subscription</a>
+      <a href="#" class="btn-secondary">Explore Our Coffees</a>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section">
+    <div class="section-label">Why Driftwood</div>
+    <h2>From farm to your cup.</h2>
+    <p>Every bag tells the story of the farm it came from. We work directly with growers so you taste the difference.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🌱</div>
+        <h3>Direct Trade</h3>
+        <p>We pay farmers above fair-trade minimums and visit every partner farm annually.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">🔥</div>
+        <h3>Roasted to Order</h3>
+        <p>Your beans are roasted within 48 hours of shipping — never sitting on a shelf.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">📦</div>
+        <h3>Flexible Subscriptions</h3>
+        <p>Pause, skip, or change your roast preference anytime from your account dashboard.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">♻️</div>
+        <h3>Zero-Waste Packaging</h3>
+        <p>All our bags are compostable. We offset 100% of shipping emissions.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products -->
+  <div class="products">
+    <div class="products-inner">
+      <h2>Current Offerings</h2>
+      <div class="product-list">
+        <div class="product-tag">☀️ Morning Fog — Light Roast</div>
+        <div class="product-tag">🌲 Cascades Blend — Medium Roast</div>
+        <div class="product-tag">🌑 Dark Harbor — Dark Roast</div>
+        <div class="product-tag">💧 Still Water — Decaf</div>
+        <div class="product-tag">🎁 Gift Subscriptions</div>
+        <div class="product-tag">⚙️ Custom Grind Options</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Banner -->
+  <div class="cta-banner">
+    <h2>Have a question?</h2>
+    <p>Our AI assistant knows everything about our coffees, subscriptions, and policies — ask it anything.</p>
+    <div class="cta-pulse">
+      <span class="pulse-dot"></span>
+      Chat assistant is live — try it in the corner →
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    © 2026 Driftwood Coffee Roasters &nbsp;·&nbsp; <a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a>
+  </footer>
+
+  <!-- Embed note (for demo only) -->
+  <div class="embed-note">
+    This widget is embedded with a single script tag:
+    <span>&lt;script src="http://localhost:8000/widget/widget.js" data-api-url="http://localhost:8000"&gt;&lt;/script&gt;</span>
+  </div>
+
+  <!-- ✅ The one-line embed — this is all any website needs -->
+  <script src="http://localhost:8000/widget/widget.js" data-api-url="http://localhost:8000"></script>
+
+</body>
+</html>

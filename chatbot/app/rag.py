@@ -62,7 +62,7 @@ def load_index() -> VectorStoreIndex:
     return VectorStoreIndex.from_vector_store(vector_store, storage_context=storage_context)
 
 
-def answer(question: str, index: VectorStoreIndex | None = None) -> dict:
+def answer(question: str, index: VectorStoreIndex | None = None, chat_history: list[dict] | None = None) -> dict:
     """Retrieve relevant chunks and generate a grounded answer with citations.
 
     Returns:
@@ -92,13 +92,18 @@ def answer(question: str, index: VectorStoreIndex | None = None) -> dict:
 
     context = "\n\n---\n\n".join(n.text for n in relevant)
 
-    messages = [
-        ChatMessage(role=MessageRole.SYSTEM, content=settings.system_prompt),
+    messages = [ChatMessage(role=MessageRole.SYSTEM, content=settings.system_prompt)]
+
+    for turn in (chat_history or []):
+        role = MessageRole.USER if turn["role"] == "user" else MessageRole.ASSISTANT
+        messages.append(ChatMessage(role=role, content=turn["content"]))
+
+    messages.append(
         ChatMessage(
             role=MessageRole.USER,
             content=f"Context:\n{context}\n\nQuestion: {question}",
-        ),
-    ]
+        )
+    )
 
     response = Settings.llm.chat(messages)
 
