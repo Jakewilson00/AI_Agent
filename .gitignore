@@ -1,0 +1,13 @@
+# Secrets — never commit
+.env
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# For real client deployments, uncomment the line below to keep docs private:
+# chatbot/data/source_docs/
