@@ -246,7 +246,7 @@
     scrollBottom();
   }
 
-  function appendBot(text, sources, handoff) {
+  function appendBot(text, handoff) {
     const row = document.createElement('div');
     row.className = 'cw-row cw-bot';
 
@@ -254,28 +254,6 @@
     msg.className = 'cw-msg' + (handoff ? ' cw-handoff' : '');
     msg.textContent = text;
     row.appendChild(msg);
-
-    if (sources && sources.length) {
-      const chips = document.createElement('div');
-      chips.className = 'cw-sources';
-      sources.forEach(src => {
-        const chip = document.createElement('span');
-        chip.className = 'cw-chip';
-        chip.textContent = '📄 ' + src.source;
-
-        const snip = document.createElement('div');
-        snip.className = 'cw-snippet';
-        snip.textContent = src.snippet;
-
-        chip.addEventListener('click', () => {
-          snip.classList.toggle('cw-show');
-          scrollBottom();
-        });
-        chips.appendChild(chip);
-        row.appendChild(snip);
-      });
-      row.appendChild(chips);
-    }
 
     msgList.appendChild(row);
     scrollBottom();
@@ -314,10 +292,10 @@
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       removeTyping();
-      appendBot(data.answer, data.sources, data.handoff);
+      appendBot(data.answer, data.handoff);
     } catch {
       removeTyping();
-      appendBot("Sorry, I couldn't reach the server right now. Please try again.", [], false);
+      appendBot("Sorry, I couldn't reach the server right now. Please try again.", false);
     } finally {
       isWaiting = false;
       sendBtn.disabled = false;

@@ -44,7 +44,9 @@ def ingest() -> dict:
 
     vector_store = ChromaVectorStore(chroma_collection=collection)
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
-    splitter = SentenceSplitter(chunk_size=512, chunk_overlap=64)
+    splitter = SentenceSplitter(
+        chunk_size=settings.chunk_size, chunk_overlap=settings.chunk_overlap
+    )
     VectorStoreIndex.from_documents(
         docs, storage_context=storage_context, transformations=[splitter], show_progress=True
     )
@@ -62,6 +64,33 @@ def load_index() -> VectorStoreIndex:
     return VectorStoreIndex.from_vector_store(vector_store, storage_context=storage_context)
 
 
+_CONDENSE_PROMPT = (
+    "Given the conversation so far and a follow-up message, rewrite the follow-up "
+    "into a standalone question that includes any context it relies on from earlier "
+    "turns. Keep it concise. If the follow-up is already self-contained, return it "
+    "unchanged. Return ONLY the rewritten question, nothing else.\n\n"
+    "Conversation:\n{history}\n\nFollow-up: {question}\n\nStandalone question:"
+)
+
+
+def _condense_question(question: str, chat_history: list[dict]) -> str:
+    """Rewrite a follow-up into a standalone question using recent history.
+
+    This lets follow-ups like "how many days did you say?" retrieve the right
+    chunks instead of wrongly handing off (FR3). No history → return as-is.
+    """
+    if not chat_history:
+        return question
+
+    history_text = "\n".join(
+        f"{turn['role'].capitalize()}: {turn['content']}" for turn in chat_history[-6:]
+    )
+    prompt = _CONDENSE_PROMPT.format(history=history_text, question=question)
+    response = Settings.llm.complete(prompt)
+    rewritten = str(response).strip()
+    return rewritten or question
+
+
 def answer(question: str, index: VectorStoreIndex | None = None, chat_history: list[dict] | None = None) -> dict:
     """Retrieve relevant chunks and generate a grounded answer with citations.
 
@@ -75,8 +104,11 @@ def answer(question: str, index: VectorStoreIndex | None = None, chat_history: l
     if index is None:
         index = load_index()
 
+    # Rewrite follow-ups into standalone questions so retrieval has full context.
+    search_query = _condense_question(question, chat_history or [])
+
     retriever = index.as_retriever(similarity_top_k=settings.top_k)
-    nodes = retriever.retrieve(question)
+    nodes = retriever.retrieve(search_query)
 
     relevant = [n for n in nodes if n.score is not None and n.score >= settings.similarity_threshold]
 
@@ -98,10 +130,13 @@ def answer(question: str, index: VectorStoreIndex | None = None, chat_history: l
         role = MessageRole.USER if turn["role"] == "user" else MessageRole.ASSISTANT
         messages.append(ChatMessage(role=role, content=turn["content"]))
 
+    # Use the condensed standalone question so the model isn't tripped up by
+    # conversational phrasing ("how many days did you say?") and answers from
+    # the retrieved context directly.
     messages.append(
         ChatMessage(
             role=MessageRole.USER,
-            content=f"Context:\n{context}\n\nQuestion: {question}",
+            content=f"Context:\n{context}\n\nQuestion: {search_query}",
         )
     )
 

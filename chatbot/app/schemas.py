@@ -25,3 +25,8 @@ class IngestResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     status: str
+
+
+class StatsResponse(BaseModel):
+    total_questions: int
+    total_handoffs: int

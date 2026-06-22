@@ -14,8 +14,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.llm import configure_llm
-from app import rag
-from app.schemas import ChatRequest, ChatResponse, SourceRef, IngestResponse, HealthResponse
+from app import rag, stats
+from app.schemas import ChatRequest, ChatResponse, SourceRef, IngestResponse, HealthResponse, StatsResponse
 
 # In-memory session store: session_id → list of {"role": "user"|"assistant", "content": str}
 _sessions: dict[str, list[dict]] = {}
@@ -80,8 +80,15 @@ def chat(req: ChatRequest):
         {"role": "assistant", "content": result["answer"]},
     ]
 
+    stats.record(handoff=result["handoff"])
+
     return ChatResponse(
         answer=result["answer"],
         sources=[SourceRef(**s) for s in result["sources"]],
         handoff=result["handoff"],
     )
+
+
+@app.get("/stats", response_model=StatsResponse)
+def get_stats():
+    return StatsResponse(**stats.get_stats())
